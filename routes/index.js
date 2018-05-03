@@ -491,7 +491,7 @@ router.get('/pais/:nombre', function(req, res) {
                                 miObjeto.bunatural=bunatural;
                                 miObjeto.manatural=manatural;
                                 informacion.push(miObjeto);
-                                console.log(informacion);
+                                //console.log(informacion);
 
                                 res.json(informacion);
                           });
