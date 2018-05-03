@@ -25,6 +25,217 @@ router.get('/test', function(req, res, next) {
   res.render('index', { title: 'view test' });
 });
 
+
+
+//---------------------------------------------------------
+//INICIO - -  S U N A T  L A  A P I
+router.get('/api/formulario', function(req, res, next) {
+    res.render('testformulario');
+  });
+router.post('/api/sunat', function(req, res, next) {
+    //variables en los cualse se gudraran los datos
+    var aduana=[],numero=[],fecha=[],cantidad=[],unidad=[],condicion=[],nomcomercial=[],caracteristica=[],marca=[],modelo=[],importador=[],proveedor=[],moneda=[],pais=[],puesto=[],pesoneto=[],pesobruto=[],fobunitario=[];
+
+    var f = new Date();
+    var fecinicial = req.body.FecInicial || '';
+    var fecfinal = req.body.FecFinal || '';
+    var partida = req.body.partida || '';
+    var pais = req.body.pais || '';
+    var importador = req.body.importador || '';
+    //primero desidmos que por defecto son 6 añospor defcto
+    console.log(fecfinal+"--"+fecinicial+"--"+partida+"--"+pais+"--"+importador);
+    console.log(f.getDate() + "/" + (f.getMonth() +1) + "/" + f.getFullYear());
+    
+    //si el usuario mete las fehcas o cogemos las fechas por defecto
+    if (fecinicial) {console.log("[u] fecha inicial : "+fecinicial);}
+    else{
+        fecinicial="01/01/2010"
+        console.log("[s] fecha inicial : "+fecinicial);
+    }
+
+    if (fecfinal) {console.log("[u] fecha final : "+fecfinal);}
+    else{
+        if (f.getDate()<10) {
+            fecfinal="0"+f.getDate();    
+        }
+        else{
+            fecfinal=f.getDate();
+        }
+        if ((f.getMonth() +1)<10) {
+            fecfinal=fecfinal+"/"+"0"+(f.getMonth() +1);
+        }
+        else{
+            fecfinal=fecfinal+"/"+(f.getMonth() +1);
+        }
+        fecfinal=fecfinal+ "/" + f.getFullYear();
+        console.log("[s] fecha inicial : "+fecfinal);
+    }
+    //los trasformamos a valores las cuales podremos manejar
+    for(var k=0;k< fecfinal.length;k++){
+        if(fecfinal[k]=='/'){
+          fecfinal[k]='%2F';
+        }
+    }
+    for(var k=0;k< fecinicial.length;k++){
+      if(fecinicial[k]=='/'){
+        fecinicial[k]='%2F';
+      }
+    }
+    const base_url='http://www.aduanet.gob.pe/cl-ad-itestdesp/Sgboletin?orden=part&FecInicial='+fecinicial+'&FecFinal='+fecfinal+'&codigo='+partida;
+    console.log(base_url);
+    const lista=[];
+    const cap=0;
+    request(base_url, function (err, body) {
+    const $ = cheerio.load(body);
+
+        $('td').each(function(i,elem){
+            lista[i]=$(this).text();
+            lista.join(',');
+        });
+        //console.log(lista);
+        //recoremo todas la palabras
+        //colocamos el 17 para que salte las palabras que no utilisaremos
+        var salta=0;
+        var amicontador;
+        let i = 18;
+        while ( i <lista.length) {
+            //primero pregunto si tenemos el filtro de pais
+            amicontador=0;
+            if(pais){//si tenemos el filtro de pais
+                if(importador){//si tenemos el filtro del pais y el importador
+                    //console.log(((lista[i+10].toLowerCase()).trim())+"=="+(importador.toLowerCase()));
+                    if (((lista[i+13].toLowerCase()).trim())==(pais.toLowerCase())&&((lista[i+10].toLowerCase()).trim())==(importador.toLowerCase())) {
+                        aduana[salta]=lista[i];
+                        numero[salta]=lista[i+1];
+                        fecha[salta]=lista[i+2];
+                        cantidad[salta]=lista[i+3];
+                        unidad[salta]=lista[i+4];
+                        condicion[salta]=lista[i+5];
+                        nomcomercial[salta]=lista[i+6];
+                        caracteristica[salta]=lista[i+7];
+                        marca[salta]=lista[i+8];
+                        modelo[salta]=lista[i+9];
+                        importador[salta]=lista[i+10];
+                        proveedor[salta]=lista[i+11];
+                        moneda[salta]=lista[i+12];
+                        pais[salta]=lista[i+13];
+                        puesto[salta]=lista[i+14];
+                        pesoneto[salta]=lista[i+15];
+                        pesobruto[salta]=lista[i+16];
+                        fobunitario[salta]=lista[i+17];
+                    } 
+                }
+                else{//si tenemos al pais pero no al importador entonces la busqueda por pais
+                    //console.log(((lista[i+13].toLowerCase()).trim())+"=="+(pais.toLowerCase()));
+                    if (((lista[i+13].toLowerCase()).trim())==(pais.toLowerCase())) {
+                        aduana[salta]=lista[i];
+                        numero[salta]=lista[i+1];
+                        fecha[salta]=lista[i+2];
+                        cantidad[salta]=lista[i+3];
+                        unidad[salta]=lista[i+4];
+                        condicion[salta]=lista[i+5];
+                        nomcomercial[salta]=lista[i+6];
+                        caracteristica[salta]=lista[i+7];
+                        marca[salta]=lista[i+8];
+                        modelo[salta]=lista[i+9];
+                        importador[salta]=lista[i+10];
+                        proveedor[salta]=lista[i+11];
+                        moneda[salta]=lista[i+12];
+                        pais[salta]=lista[i+13];
+                        puesto[salta]=lista[i+14];
+                        pesoneto[salta]=lista[i+15];
+                        pesobruto[salta]=lista[i+16];
+                        fobunitario[salta]=lista[i+17];
+                    }
+                }
+            }
+            else{//no tenemos el filtro de pais
+                if(importador){//si tenemos el filtro del importador
+                    if (((lista[i+10].toLowerCase()).trim())==(importador.toLowerCase())) {
+                        aduana[salta]=lista[i];
+                        numero[salta]=lista[i+1];
+                        fecha[salta]=lista[i+2];
+                        cantidad[salta]=lista[i+3];
+                        unidad[salta]=lista[i+4];
+                        condicion[salta]=lista[i+5];
+                        nomcomercial[salta]=lista[i+6];
+                        caracteristica[salta]=lista[i+7];
+                        marca[salta]=lista[i+8];
+                        modelo[salta]=lista[i+9];
+                        importador[salta]=lista[i+10];
+                        proveedor[salta]=lista[i+11];
+                        moneda[salta]=lista[i+12];
+                        pais[salta]=lista[i+13];
+                        puesto[salta]=lista[i+14];
+                        pesoneto[salta]=lista[i+15];
+                        pesobruto[salta]=lista[i+16];
+                        fobunitario[salta]=lista[i+17];
+                    }
+                }
+                else{//no tenemos el filtro del importador ni del pais es quiere decir que queremo todo
+                        aduana[salta]=lista[i];
+                        numero[salta]=lista[i+1];
+                        fecha[salta]=lista[i+2];
+                        cantidad[salta]=lista[i+3];
+                        unidad[salta]=lista[i+4];
+                        condicion[salta]=lista[i+5];
+                        nomcomercial[salta]=lista[i+6];
+                        caracteristica[salta]=lista[i+7];
+                        marca[salta]=lista[i+8];
+                        modelo[salta]=lista[i+9];
+                        importador[salta]=lista[i+10];
+                        proveedor[salta]=lista[i+11];
+                        moneda[salta]=lista[i+12];
+                        pais[salta]=lista[i+13];
+                        puesto[salta]=lista[i+14];
+                        pesoneto[salta]=lista[i+15];
+                        pesobruto[salta]=lista[i+16];
+                        fobunitario[salta]=lista[i+17];
+                }
+            }
+
+            //ya mira hacemo un contador que cuenta de est amaner
+            //aduan[h]=lista[i] de esa manera se pondra como un elemento
+            //por que si lo podemos de esta amaner
+            //aduana=aduana+lista[i] no nos saldra separado 
+            i=i+18;
+            salta=salta+1;
+            
+        }
+        console.log("estos son las aduanas : "+aduana.length);
+        console.log("estos son los numeros : "+numero.length);
+        console.log("estos son las fechas : "+fecha.length);
+        console.log("estos son las cantidades : "+cantidad.length);
+        console.log("estos son las unidad : "+unidad.length);
+        console.log("estos son las condicion : "+condicion.length);
+        console.log("estos son las caracteristica : "+caracteristica.length);
+        console.log("estos son las marca : "+marca.length);
+        console.log("estos son las modelo : "+modelo.length);
+
+        console.log("estos son las importador : "+importador.length);
+        console.log("estos son las proveedor : "+proveedor.length);
+        console.log("estos son las moneda : "+moneda.length);
+        console.log("estos son las pais : "+pais.length);
+        console.log("estos son las puesto : "+puesto.length);
+        console.log("estos son las pesoneto : "+pesoneto.length);
+        console.log("estos son las pesobruto : "+pesobruto.length);
+        
+        console.log("estos son los fobunitario : "+fobunitario.length);
+        //console.log(lista);
+        //res.render('index', { title: "alvaro ",data:lista});
+    });
+
+
+    res.send('<h2>Escrapeando a la sunat'+ '...</h2>');
+
+  });
+  //tengsmo en cuenta que los atos sencales ara realisar el scraper
+  //son la fecha inicial a fecha final y la partida
+//FIN - - S U N A T   L A    A P I
+
+
+
+
 router.get('/pais/:nombre', function(req, res) {
     var informacion=[];
   var lista_bbc=[];

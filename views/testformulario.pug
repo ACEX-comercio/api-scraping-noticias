@@ -1,0 +1,31 @@
+extends layout
+
+block content
+    form(name="add-estimation", method="post",action="/api/sunat")
+        div.input
+            span.label Fecha de inicio
+            br
+            input(type="text", name="FecInicial", id="FecInicial")
+        br
+        div.input
+            span.label Fecha final
+            br
+            input(type="text", name="FecFinal", id="FecFinal")
+        br
+        div.input
+            span.label Partida arancelaria *
+            br
+            input(type="text", name="partida", id="partida")
+        hr
+        div.input
+            span.labe Pais
+            br
+            input(type="text",name="pais",id="pais")
+        br
+        .input
+            span.lave importador
+            br
+            input(type="text",name="importador",id="importador")
+        br
+        div.actions
+            input(type="submit", value="buscar")
